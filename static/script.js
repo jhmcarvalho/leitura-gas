@@ -9,6 +9,10 @@ let anoAtual = new Date().getFullYear();
 let valorKg = 0;
 let isMobile = false; // Flag para detectar dispositivos móveis
 
+// Variáveis para o Modo Rápido
+let quickEntryIndex = 0;
+let quickEntryApartamentos = [];
+
 // Inicializar a aplicação
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Inicializando aplicação...');
@@ -480,4 +484,197 @@ async function mostrarApartamentosExistentes() {
         console.error('Erro ao listar apartamentos existentes:', error);
         alert('Erro ao listar apartamentos existentes');
     }
+}
+
+// Função para iniciar o Modo Rápido
+async function iniciarModoRapido() {
+    // Verificar se há valor do kg configurado
+    valorKg = parseFloat(document.getElementById('valor-kg-atual').value || 0);
+    if (!valorKg) {
+        alert('Por favor, informe o valor do KG antes de iniciar o Modo Rápido');
+        document.getElementById('valor-kg-atual').focus();
+        return;
+    }
+    
+    // Obter mês e ano
+    mesAtual = parseInt(document.getElementById('mes-atual').value);
+    anoAtual = parseInt(document.getElementById('ano-atual').value);
+    
+    // Carregar apartamentos caso ainda não tenha feito
+    if (apartamentos.length === 0) {
+        apartamentos = await carregarApartamentos();
+    }
+    
+    if (apartamentos.length === 0) {
+        alert('Nenhum apartamento cadastrado. Cadastre apartamentos primeiro.');
+        return;
+    }
+    
+    // Carregar leituras existentes para o mês
+    try {
+        const response = await fetch(`${API_URL}/leituras/${mesAtual}/${anoAtual}`);
+        leituras = await response.json();
+        
+        // Preparar lista de apartamentos ordenados
+        quickEntryApartamentos = [...apartamentos];
+        quickEntryApartamentos.sort((a, b) => {
+            const numA = parseInt(a.numero.replace(/\D/g, ''));
+            const numB = parseInt(b.numero.replace(/\D/g, ''));
+            
+            if (!isNaN(numA) && !isNaN(numB)) {
+                return numA - numB;
+            }
+            
+            return a.numero.localeCompare(b.numero);
+        });
+        
+        // Iniciar o processo com o primeiro apartamento
+        quickEntryIndex = 0;
+        mostrarProximoApartamento();
+    } catch (error) {
+        console.error('Erro ao carregar leituras:', error);
+        alert('Erro ao carregar dados para o Modo Rápido. Tente novamente.');
+    }
+}
+
+// Função para mostrar o próximo apartamento no modo rápido
+async function mostrarProximoApartamento() {
+    if (quickEntryIndex >= quickEntryApartamentos.length) {
+        // Finalizou todos os apartamentos
+        mostrarMensagemSucesso();
+        await carregarLeituras(); // Recarregar tabela
+        return;
+    }
+    
+    const apt = quickEntryApartamentos[quickEntryIndex];
+    
+    // Verificar se já existe leitura para este apartamento
+    const leitura = leituras.find(l => l.apartamento_id == apt.id);
+    
+    // Buscar leitura anterior
+    const leituraAnterior = await carregarLeituraAnterior(apt.id, mesAtual, anoAtual);
+    
+    // Criar modal de entrada rápida
+    const modal = document.createElement('div');
+    modal.className = 'quick-entry-modal';
+    modal.id = 'quick-entry-modal';
+    
+    let leituraAtual = leitura ? leitura.leitura_atual : '';
+    
+    modal.innerHTML = `
+        <div class="quick-entry-card">
+            <button class="quick-entry-close" onclick="fecharModoRapido()">×</button>
+            <div class="quick-entry-apartment">Apartamento ${apt.numero}</div>
+            <div class="quick-entry-previous">Leitura Anterior: ${leituraAnterior.toFixed(2)} m³</div>
+            <div class="quick-entry-current-label">Informe a Leitura Atual:</div>
+            <input type="number" id="quick-entry-input" step="0.01" value="${leituraAtual}" placeholder="Digite aqui" />
+            <div class="quick-entry-buttons">
+                <button class="save-btn" onclick="salvarLeituraRapida(${apt.id}, ${leituraAnterior})">Salvar</button>
+                <button class="skip-btn" onclick="pularApartamento()">Pular</button>
+            </div>
+            <div class="quick-entry-progress">
+                ${quickEntryIndex + 1} de ${quickEntryApartamentos.length} apartamentos
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Focar no campo de entrada
+    setTimeout(() => {
+        const input = document.getElementById('quick-entry-input');
+        input.focus();
+        
+        // Configurar evento de tecla
+        input.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                salvarLeituraRapida(apt.id, leituraAnterior);
+            }
+        });
+    }, 100);
+}
+
+// Função para salvar a leitura no modo rápido
+async function salvarLeituraRapida(apartamentoId, leituraAnterior) {
+    const leituraAtual = parseFloat(document.getElementById('quick-entry-input').value);
+    
+    if (isNaN(leituraAtual)) {
+        alert('Por favor, informe um valor válido para a leitura atual');
+        return;
+    }
+    
+    // Calcular consumo
+    const consumo = leituraAtual - leituraAnterior;
+    
+    // Validar se a leitura faz sentido
+    if (consumo < 0) {
+        const confirmaValor = confirm('A leitura atual é menor que a anterior. Isso está correto?');
+        if (!confirmaValor) {
+            return; // Não prosseguir com o salvamento
+        }
+    }
+    
+    try {
+        // Enviar dados para o servidor
+        const response = await fetch(`${API_URL}/leituras`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                apartamento_id: apartamentoId,
+                mes: mesAtual,
+                ano: anoAtual,
+                leitura_atual: leituraAtual,
+                leitura_anterior: leituraAnterior,
+                valor_kg: valorKg
+            })
+        });
+        
+        if (response.ok) {
+            // Atualizar lista de leituras
+            const novaLeituraResponse = await fetch(`${API_URL}/leituras/${mesAtual}/${anoAtual}`);
+            leituras = await novaLeituraResponse.json();
+            
+            // Próximo apartamento
+            quickEntryIndex++;
+            fecharModoRapido();
+            mostrarProximoApartamento();
+        } else {
+            alert('Erro ao salvar leitura. Tente novamente.');
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao salvar leitura. Verifique sua conexão.');
+    }
+}
+
+// Função para pular um apartamento
+function pularApartamento() {
+    quickEntryIndex++;
+    fecharModoRapido();
+    mostrarProximoApartamento();
+}
+
+// Função para fechar o modal do modo rápido
+function fecharModoRapido() {
+    const modal = document.getElementById('quick-entry-modal');
+    if (modal) {
+        document.body.removeChild(modal);
+    }
+}
+
+// Função para mostrar mensagem de sucesso
+function mostrarMensagemSucesso() {
+    const mensagem = document.createElement('div');
+    mensagem.className = 'quick-entry-success';
+    mensagem.innerHTML = 'Todas as leituras foram processadas!';
+    document.body.appendChild(mensagem);
+    
+    // Remover a mensagem após 3 segundos
+    setTimeout(() => {
+        if (document.body.contains(mensagem)) {
+            document.body.removeChild(mensagem);
+        }
+    }, 3000);
 } 

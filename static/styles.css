@@ -342,4 +342,164 @@ button:hover {
 /* Manter toque fácil em botões */
 button {
     min-height: 44px; /* Área mínima recomendada para toque */
+}
+
+/* Botão de Modo Rápido */
+.quick-entry-button {
+    margin: 15px 0;
+    text-align: center;
+}
+
+.quick-entry-button button {
+    background-color: #ff5722;
+    color: white;
+    padding: 15px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 50px;
+    width: 100%;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: all 0.3s;
+}
+
+.quick-entry-button button:hover {
+    background-color: #e64a19;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+}
+
+/* Ocultar em desktop, mostrar apenas em mobile */
+.mobile-only {
+    display: none;
+}
+
+/* Modo Rápido Modal */
+.quick-entry-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.quick-entry-card {
+    background-color: white;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    padding: 20px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+    text-align: center;
+    position: relative;
+}
+
+.quick-entry-apartment {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.quick-entry-previous {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #666;
+}
+
+.quick-entry-current-label {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.quick-entry-card input {
+    width: 100%;
+    font-size: 28px;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+    border: 2px solid #4CAF50;
+    border-radius: 8px;
+}
+
+.quick-entry-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.quick-entry-buttons button {
+    width: 48%;
+    padding: 15px;
+    font-size: 18px;
+    border-radius: 8px;
+}
+
+.quick-entry-buttons .save-btn {
+    background-color: #4CAF50;
+}
+
+.quick-entry-buttons .skip-btn {
+    background-color: #FF9800;
+}
+
+.quick-entry-progress {
+    font-size: 14px;
+    margin-top: 15px;
+    color: #555;
+}
+
+.quick-entry-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.quick-entry-success {
+    background-color: rgba(76, 175, 80, 0.9);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 20px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3000;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    animation: fadeOut 3s forwards;
+    animation-delay: 1.5s;
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; visibility: hidden; }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .mobile-only {
+        display: block;
+    }
+    
+    /* Resto do código permance igual */
 } 
