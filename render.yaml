@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: leitura-gas
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m gunicorn app:app
+    repo: https://github.com/SEU_USUARIO/leitura-gas.git # Substitua pelo seu repositório
+    branch: main
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.18 
