@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Leitura de Gás</title>
     <link rel="stylesheet" href="/static/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
     <script>
         // Verificar se o documento carregou corretamente
         document.addEventListener('DOMContentLoaded', function() {
@@ -17,38 +20,42 @@
         });
     </script>
 </head>
-<body>
+<body class="cyberpunk-theme">
+    <div class="cyber-background"></div>
+    <div class="cyber-grid"></div>
+    
     <div class="container">
-        <h1>Controle de Leitura de Gás</h1>
+        <div class="cyber-header">
+            <h1>Controle de Leitura de Gás</h1>
+            <div class="cyber-lines"></div>
+        </div>
         
-        <div class="section">
-            <h2>Cadastrar Novo Apartamento</h2>
-            <form id="form-apartamento">
-                <input type="text" id="numero-apartamento" placeholder="Número do Apartamento" required>
-                <button type="submit">Cadastrar</button>
-                <button type="button" onclick="mostrarApartamentosExistentes()">Listar Cadastrados</button>
+        <div class="section cyber-panel">
+            <div class="cyber-title">
+                <h2>Cadastrar Novo Apartamento</h2>
+                <div class="cyber-accent"></div>
+            </div>
+            <form id="form-apartamento" class="cyber-form">
+                <input type="text" id="numero-apartamento" placeholder="Número do Apartamento" required class="cyber-input">
+                <button type="submit" class="cyber-button primary">Cadastrar</button>
+                <button type="button" onclick="mostrarApartamentosExistentes()" class="cyber-button secondary">Listar Cadastrados</button>
             </form>
             <div id="lista-apartamentos" style="margin-top: 15px; display: none;">
-                <h3>Apartamentos Cadastrados:</h3>
-                <ul id="apartamentos-existentes"></ul>
+                <h3 class="cyber-subtitle">Apartamentos Cadastrados:</h3>
+                <ul id="apartamentos-existentes" class="cyber-list"></ul>
             </div>
         </div>
 
-        <div class="section">
-            <h2>Registrar Leituras do Mês</h2>
-            
-            <div class="info-box">
-                <p><strong>Instruções:</strong> Clique na célula de "Leitura Atual" ou no botão "Editar" para inserir um novo valor.</p>
-                <p>Os valores são calculados automaticamente usando a fórmula: <br>
-                   Consumo m³ = Leitura Atual - Leitura Anterior<br>
-                   Consumo kg = Consumo m³ × 2,4<br>
-                   Valor Total = (Consumo kg × Valor por kg) ÷ 1000</p>
+        <div class="section cyber-panel">
+            <div class="cyber-title">
+                <h2>Registrar Leituras do Mês</h2>
+                <div class="cyber-accent"></div>
             </div>
             
-            <div class="form-row">
+            <div class="form-row cyber-controls">
                 <div class="form-group">
-                    <label for="mes-atual">Mês:</label>
-                    <select id="mes-atual" required>
+                    <label for="mes-atual" class="cyber-label">Mês:</label>
+                    <select id="mes-atual" required class="cyber-select">
                         <option value="1">Janeiro</option>
                         <option value="2">Fevereiro</option>
                         <option value="3">Março</option>
@@ -65,26 +72,26 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="ano-atual">Ano:</label>
-                    <input type="number" id="ano-atual" value="2024" required>
+                    <label for="ano-atual" class="cyber-label">Ano:</label>
+                    <input type="number" id="ano-atual" value="2024" required class="cyber-input">
                 </div>
                 
                 <div class="form-group">
-                    <label for="valor-kg-atual">Valor do KG (R$):</label>
-                    <input type="number" id="valor-kg-atual" step="0.01" value="15.00" required>
+                    <label for="valor-kg-atual" class="cyber-label">Valor do KG (R$):</label>
+                    <input type="number" id="valor-kg-atual" step="0.01" value="15.00" required class="cyber-input">
                 </div>
                 
                 <div class="form-group">
-                    <button id="btn-carregar" onclick="carregarLeituras()">Atualizar Dados</button>
+                    <button id="btn-carregar" onclick="carregarLeituras()" class="cyber-button refresh">Atualizar Dados</button>
                 </div>
             </div>
             
             <!-- Botão de Modo Rápido para Celular -->
             <div class="mobile-only quick-entry-button">
-                <button id="btn-modo-rapido" onclick="iniciarModoRapido()">MODO RÁPIDO: Lançar Leituras</button>
+                <button id="btn-modo-rapido" onclick="iniciarModoRapido()" class="cyber-button neon-pulse">MODO RÁPIDO: Lançar Leituras</button>
             </div>
             
-            <table id="tabela-leituras" class="editable-table">
+            <table id="tabela-leituras" class="editable-table cyber-table">
                 <thead>
                     <tr>
                         <th>Apartamento</th>
@@ -102,7 +109,7 @@
             </table>
             
             <div class="button-row">
-                <button id="btn-imprimir" onclick="imprimirLista()">Imprimir Lista</button>
+                <button id="btn-imprimir" onclick="imprimirLista()" class="cyber-button secondary">Imprimir Lista</button>
             </div>
         </div>
     </div>
